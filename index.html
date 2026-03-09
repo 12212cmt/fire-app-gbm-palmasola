@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Investimentos com Juros Compostos</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Título -->
+        <h1>Simulador de Investimentos</h1>
+        <p class="subtitle">Calcule o crescimento do seu patrimônio com juros compostos</p>
+
+        <!-- Formulário de Entrada -->
+        <div class="form-section">
+            <h2>Parâmetros de Investimento</h2>
+            
+            <div class="form-group">
+                <label for="initialValue">Valor Inicial (R$)</label>
+                <input type="number" id="initialValue" placeholder="0,00" min="0" step="0.01" value="10000">
+            </div>
+
+            <div class="form-group">
+                <label for="monthlyDeposit">Aporte Mensal (R$)</label>
+                <input type="number" id="monthlyDeposit" placeholder="0,00" min="0" step="0.01" value="1000">
+            </div>
+
+            <div class="form-group">
+                <label for="monthlyRate">Taxa de Juros Mensal (%)</label>
+                <input type="number" id="monthlyRate" placeholder="0,00" min="0" step="0.01" value="1">
+            </div>
+
+            <div class="form-group">
+                <label for="startDate">Data Inicial (Mês/Ano)</label>
+                <input type="month" id="startDate" value="2024-03">
+            </div>
+
+            <div class="form-group">
+                <label for="years">Número de Anos da Simulação</label>
+                <input type="number" id="years" placeholder="5" min="1" step="1" value="5">
+            </div>
+        </div>
+
+        <!-- Aportes Recorrentes -->
+        <div class="form-section">
+            <h2>Aportes Recorrentes (Anuais)</h2>
+            <p class="section-info">Aportes que ocorrem todo ano no mês especificado</p>
+            
+            <div class="table-wrapper">
+                <table id="recurringDepositsTable" class="deposits-table">
+                    <thead>
+                        <tr>
+                            <th>Valor (R$)</th>
+                            <th>Mês</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="number" class="deposit-value" placeholder="0,00" min="0" step="0.01" value="5000"></td>
+                            <td>
+                                <select class="deposit-month">
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Março</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6" selected>Junho</option>
+                                    <option value="7">Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                            </td>
+                            <td><button class="btn-remove" onclick="removeRecurringRow(this)">Remover</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn-add" onclick="addRecurringRow()">+ Adicionar Linha</button>
+        </div>
+
+        <!-- Aportes Únicos -->
+        <div class="form-section">
+            <h2>Aportes Únicos</h2>
+            <p class="section-info">Aportes em data específica (uma única vez)</p>
+            
+            <div class="table-wrapper">
+                <table id="oneTimeDepositsTable" class="deposits-table">
+                    <thead>
+                        <tr>
+                            <th>Valor (R$)</th>
+                            <th>Mês</th>
+                            <th>Ano</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="number" class="deposit-value" placeholder="0,00" min="0" step="0.01" value="10000"></td>
+                            <td>
+                                <select class="deposit-month">
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Março</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6">Junho</option>
+                                    <option value="7" selected>Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                            </td>
+                            <td><input type="number" class="deposit-year" placeholder="2024" min="2000" step="1" value="2025"></td>
+                            <td><button class="btn-remove" onclick="removeOneTimeRow(this)">Remover</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn-add" onclick="addOneTimeRow()">+ Adicionar Linha</button>
+        </div>
+
+        <!-- Botão Principal -->
+        <div class="button-section">
+            <button class="btn-primary" onclick="generateSimulation()">Executar Simulação</button>
+        </div>
+
+        <!-- Resultados -->
+        <div id="resultsSection" class="results-section" style="display: none;">
+            
+            <!-- Tabela de Resultados -->
+            <div class="table-section">
+                <h2>Resultados Mês a Mês</h2>
+                <div class="table-wrapper">
+                    <table id="resultsTable" class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Período</th>
+                                <th>Saldo Inicial (R$)</th>
+                                <th>Aplicação (R$)</th>
+                                <th>Juros (R$)</th>
+                                <th>Saldo Final (R$)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="charts-section">
+                <div class="chart-container">
+                    <h3>Crescimento do Patrimônio</h3>
+                    <canvas id="growthChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Comparação: Investido vs. Juros</h3>
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Resumo Final -->
+            <div class="summary-section">
+                <h2>Resumo Final</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="summary-label">Total Investido</span>
+                        <span class="summary-value" id="totalInvested">R$ 0,00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Total de Juros</span>
+                        <span class="summary-value" id="totalInterest">R$ 0,00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Saldo Final</span>
+                        <span class="summary-value highlight" id="finalBalance">R$ 0,00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Rentabilidade (%)</span>
+                        <span class="summary-value" id="profitability">0,00%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
